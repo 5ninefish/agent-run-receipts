@@ -13,20 +13,34 @@ from arr.policy import check_policy, load_policy, paths_from_unified_diff
 def _input_record(path: Path | None, *, raw: str | None = None, label: str) -> dict[str, Any]:
     if path is not None:
         digest, nbytes = sha256_file(path)
-        return {
-            "label": label,
-            "path": str(path),
-            "sha256": digest,
-            "bytes": nbytes,
-        }
+        return {"label": label, "source": "supplied-file", "sha256": digest, "bytes": nbytes}
     text = raw if raw is not None else ""
     encoded = text.encode("utf-8")
     return {
         "label": label,
-        "path": None,
+        "source": "inline",
         "sha256": sha256_text(text),
         "bytes": len(encoded),
     }
+
+
+def factual_claims(*, policy_result: dict, tests: dict, changed_paths: list[str]) -> list[dict]:
+    """Observable facts only. Not 'the agent was constrained'."""
+    env_hit = any(v["rule"] == "deny_path_globs" for v in policy_result.get("violations") or [])
+    secret_hit = any(v["rule"] == "deny_diff_regexes" for v in policy_result.get("violations") or [])
+    return [
+        {"claim": "diff_modifies_denied_path", "value": env_hit, "basis": "deny_path_globs vs changed_paths"},
+        {"claim": "diff_matches_secret_regex", "value": secret_hit, "basis": "deny_diff_regexes vs diff text"},
+        {"claim": "changed_path_count", "value": len(changed_paths)},
+        {"claim": "test_command_requested", "value": tests.get("reason") != "no test command" and tests.get("ran") is not None},
+        {"claim": "test_executed", "value": bool(tests.get("ran"))},
+        {"claim": "test_exit_code", "value": tests.get("exit_code")},
+        {"claim": "transcript_complete", "value": "unknown"},
+        {
+            "claim": "scope",
+            "value": "hashes and derived checks on supplied artifacts only; no proof of unrecorded agent actions; SHA-256 is not a signer identity",
+        },
+    ]
 
 
 def run_tests(command: str, *, cwd: Path | None, timeout: int) -> dict[str, Any]:
@@ -101,7 +115,10 @@ def emit_receipt(
         "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "inputs": {
             "diff": _input_record(diff_path, raw=diff_text, label="diff"),
-            "transcript": _input_record(transcript_path, raw=transcript_text, label="transcript"),
+            "transcript": {
+                **_input_record(transcript_path, raw=transcript_text, label="transcript"),
+                "complete": "unknown",
+            },
             "policy": _input_record(
                 policy_path,
                 raw=None if policy_path else __import__("json").dumps(policy, sort_keys=True),
@@ -117,8 +134,17 @@ def emit_receipt(
         "checks": {
             "policy": policy_result,
             "tests": tests,
+            "claims": factual_claims(
+                policy_result=policy_result, tests=tests, changed_paths=changed
+            ),
         },
-        "judges": judges or {"note": "optional; omitted in v0 unless supplied"},
+        "limits": {
+            "does_not_prove": [
+                "agent performed no unrecorded actions",
+                "who created this receipt",
+                "runtime enforcement of policy unless the check below actually observed the artifact",
+            ]
+        },
     }
     if extra:
         receipt["extra"] = extra

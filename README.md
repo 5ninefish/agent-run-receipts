@@ -1,84 +1,55 @@
 # Agent Run Receipts
 
-A CLI / GitHub Action that takes an agent's **diff + transcript + policy + test command** and emits a **verifiable receipt**: what was checked, whether policy passed, whether tests ran, and tamper-evident SHA-256 hashes of every input.
+A vendor-neutral **evidence object** for one agent-produced source change.
 
-This is **not** a security scanner and **not** an EU AI Act / CISO product. Scanners ask "does this look dangerous?" Receipts ask "what evidence exists that this agent change was inspected, constrained, and tested?"
+It answers:
+
+> What evidence accompanied this change, what did that evidence say, and has the recorded evidence changed since the receipt was created?
+
+It does **not** answer: “was the agent good,” “was the agent fully constrained,” or “who signed this.”
 
 ```
-diff + transcript + policy + optional tests
-        │
-        ▼
-   arr emit
-        │
-        ▼
-receipt.json  (content-addressed; receipt_sha256 covers the body)
+CHANGE → AGENT EVIDENCE (hashed) → POLICY CHECKS (facts) → TEST EVIDENCE → RECEIPT
 ```
 
-## Why this exists
+Not a scanner. Not SLSA. Not GitHub Copilot’s vendor log. Those already exist. This is one portable JSON object Cursor / Claude Code / Codex / Grok / Copilot can all emit.
 
-Coding agents now produce real pull requests. Teams still merge on vibe, a scanner badge, or a chat summary. Those are not the same artifact. A receipt is a small, inspectable record another human or later agent can re-hash.
+## Claims v0 actually makes
 
-Day-1 scope is deliberately narrow. Judges, hosted SaaS, and procurement theater are out of v0.
+- The supplied diff / transcript / policy / test command were hashed.
+- These **factual** checks against the supplied artifacts: denied paths in the diff, secret-like regex hits, test requested/executed/exit code.
+- `receipt_sha256` lets you see if **this receipt file** was altered later.
+
+## Claims v0 does not make
+
+- The transcript is complete (`transcript.complete` is always `unknown`).
+- The agent did nothing unrecorded (it cannot know).
+- SHA-256 identifies the author.
+- Policy PASS means runtime enforcement, unless ARR actually saw the artifact (e.g. the diff contains `.env`).
+
+Raw transcripts and test logs stay off the receipt. Only hashes and derived facts go in. The org keeps the private files.
 
 ## You do not run this by hand
 
-Install once. After that, **every pull request** gets a receipt. That is the product.
-
-1. Copy [`examples/install-on-your-repo.yml`](examples/install-on-your-repo.yml) to `.github/workflows/agent-run-receipt.yml` in your repo.
-2. Open a PR (agent-written or human). The Action diffs the PR, emits `agent-run-receipt.json`, and comments the fingerprint.
-3. You never pick a moment to “run receipts.”
-
-Manual CLI is only for debugging or repos without GitHub.
+Copy [`examples/install-on-your-repo.yml`](examples/install-on-your-repo.yml) to `.github/workflows/agent-run-receipt.yml`. Every pull request gets a receipt.
 
 ```bash
-# from this directory, no extra deps
 PYTHONPATH=. python3 -m arr emit --diff examples/ok.diff --transcript examples/transcript.txt --policy examples/policy.json
-
-# or, in a dirty git checkout, hash whatever is uncommitted:
 PYTHONPATH=. python3 -m arr emit --from-git HEAD
 ```
 
-Or:
+Exit `0` = supplied-artifact policy checks passed (and tests passed if `--run-tests`). Exit `2` = a recorded check failed.
 
-```bash
-pip install -e .
-arr emit --diff examples/ok.diff -o receipt.json
-```
+## What this will not become
 
-Exit `0` = policy passed (and tests passed if `--run-tests`). Exit `2` = policy failed or tests failed.
+- Snyk / an AI code reviewer / an AI governance suite / a compliance platform
+- Sigstore / GitHub App / hosted dashboard — not until reality votes (see [PROOF.md](PROOF.md))
 
-## GitHub Action
+SBOM does not tell you if software is good. A receipt does not tell you if an agent change is good. It records what evidence accompanied the run.
 
-```yaml
-- uses: 5ninefish/agent-run-receipts@v0
-  with:
-    diff: agent.patch
-    transcript: agent.transcript.md
-    policy: policy.json
-    test_cmd: pytest -q
-    run_tests: "true"
-    output: agent-run-receipt.json
-```
+## Proof
 
-## What v0 records
-
-- SHA-256 and byte length of the diff, transcript, and policy
-- SHA-256 of the test command string
-- Changed paths parsed from a unified diff
-- Policy pass/fail + violation list (deny path globs, deny regexes, max diff size)
-- Optional test run: exit code, timeout flag, stdout/stderr hashes (not the raw logs)
-- `receipt_sha256` over the canonical JSON body (that field itself excluded)
-
-## What v0 will not become
-
-- Snyk / SkillSpector / Aguara Watch
-- SOC2 or EU AI Act compliance paperwork
-- A CISO sales motion
-- A hosted platform until the 30-day kill bar says people actually use the CLI
-
-## Proof protocol
-
-See [PROOF.md](PROOF.md). Pre-registered kill: in 30 days, fewer than 10 teams try it on private repos, **or** fewer than 3 will pay/deposit for hosted, **or** inbound is all "cool research," **or** it becomes "Snyk but smaller."
+[PROOF.md](PROOF.md). Clock started 2026-08-13. Kill check 2026-09-12.
 
 ## License
 

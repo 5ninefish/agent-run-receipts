@@ -138,3 +138,9 @@ def test_cli_passes_clean_diff_without_running_tests(tmp_path):
     receipt = json.loads(out.read_text())
     assert receipt["checks"]["policy"]["pass"] is True
     assert receipt["checks"]["tests"]["ran"] is False
+    assert "path" not in receipt["inputs"]["diff"]
+    assert receipt["inputs"]["transcript"]["complete"] == "unknown"
+    assert any(c["claim"] == "transcript_complete" for c in receipt["checks"]["claims"])
+    blob = json.dumps(receipt)
+    assert "API_KEY" not in blob
+    assert "supersecret" not in blob
