@@ -42,7 +42,9 @@ Kill if **any** of:
 4. Positioning slides into **"Snyk but smaller"**
 5. Closing a deal requires **SOC2 / procurement / legal-assurance** selling
 
-Clock starts on the public publish date recorded in the discovery ledger, **not** on the private scaffold date.
+Clock started **2026-08-13** on public publish of
+`https://github.com/5ninefish/agent-run-receipts`.
+Kill check: 2026-09-12.
 
 ## Success (does not auto-promote to a company)
 

@@ -78,6 +78,39 @@ def test_cli_fails_on_policy_violation(tmp_path):
     assert receipt["receipt_sha256"]
 
 
+def test_cli_from_git_uncommitted(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@example.com"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=repo, check=True)
+    (repo / "a.txt").write_text("one\n", encoding="utf-8")
+    subprocess.run(["git", "add", "a.txt"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(["git", "commit", "-m", "init"], cwd=repo, check=True, capture_output=True)
+    (repo / "a.txt").write_text("two\n", encoding="utf-8")
+    out = tmp_path / "receipt.json"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "arr",
+            "emit",
+            "--from-git",
+            "HEAD",
+            "--cwd",
+            str(repo),
+            "-o",
+            str(out),
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+    receipt = json.loads(out.read_text())
+    assert "a.txt" in receipt["changed_paths"]
+
+
 def test_cli_passes_clean_diff_without_running_tests(tmp_path):
     out = tmp_path / "receipt.json"
     proc = subprocess.run(

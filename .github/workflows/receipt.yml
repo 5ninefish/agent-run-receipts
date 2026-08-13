@@ -1,0 +1,70 @@
+name: Agent run receipt
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  receipt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Diff this PR
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          git diff "origin/${{ github.base_ref }}...HEAD" > /tmp/pr.diff
+          wc -l /tmp/pr.diff
+
+      - name: Emit receipt
+        working-directory: ${{ github.workspace }}
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python3 -m arr emit \
+            --diff /tmp/pr.diff \
+            --policy examples/policy.json \
+            --test-cmd "python3 -m pytest -q" \
+            --run-tests \
+            -o agent-run-receipt.json || true
+          # always keep the file even if policy/tests fail
+          test -f agent-run-receipt.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agent-run-receipt
+          path: agent-run-receipt.json
+
+      - name: Comment receipt on the PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const rec = JSON.parse(fs.readFileSync('agent-run-receipt.json', 'utf8'));
+            const pol = rec.checks.policy.pass ? 'pass' : 'FAIL';
+            const tests = rec.checks.tests;
+            const t = tests.ran ? `exit ${tests.exit_code}` : 'not run';
+            const body = [
+              '### Agent run receipt',
+              '',
+              `This pull request has a receipt. It is evidence of what changed and what was checked — not a security score.`,
+              '',
+              `- \`receipt_sha256\`: \`${rec.receipt_sha256}\``,
+              `- policy: **${pol}**`,
+              `- tests: ${t}`,
+              `- files: ${(rec.changed_paths || []).slice(0, 12).join(', ') || '(none)'}`,
+              '',
+              'Artifact: **agent-run-receipt** on this workflow run.',
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });

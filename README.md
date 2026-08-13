@@ -20,11 +20,22 @@ Coding agents now produce real pull requests. Teams still merge on vibe, a scann
 
 Day-1 scope is deliberately narrow. Judges, hosted SaaS, and procurement theater are out of v0.
 
-## Install
+## You do not run this by hand
+
+Install once. After that, **every pull request** gets a receipt. That is the product.
+
+1. Copy [`examples/install-on-your-repo.yml`](examples/install-on-your-repo.yml) to `.github/workflows/agent-run-receipt.yml` in your repo.
+2. Open a PR (agent-written or human). The Action diffs the PR, emits `agent-run-receipt.json`, and comments the fingerprint.
+3. You never pick a moment to “run receipts.”
+
+Manual CLI is only for debugging or repos without GitHub.
 
 ```bash
 # from this directory, no extra deps
 PYTHONPATH=. python3 -m arr emit --diff examples/ok.diff --transcript examples/transcript.txt --policy examples/policy.json
+
+# or, in a dirty git checkout, hash whatever is uncommitted:
+PYTHONPATH=. python3 -m arr emit --from-git HEAD
 ```
 
 Or:

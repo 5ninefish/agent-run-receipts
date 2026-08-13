@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Run Receipts</title>
+<style>
+:root { --bg:#0e1110; --fg:#e9eee9; --muted:#8b968c; --line:#2a332c; --ok:#9ec27a; }
+@media (prefers-color-scheme: light) {
+  :root { --bg:#f4f1ea; --fg:#1b1f1c; --muted:#5c665f; --line:#d5d0c4; --ok:#2f6b32; }
+}
+body { margin:0; font:18px/1.5 ui-sans-serif,system-ui,sans-serif; background:var(--bg); color:var(--fg); }
+main { max-width:680px; margin:0 auto; padding:3rem 1.25rem 5rem; }
+h1 { font-size:1.8rem; letter-spacing:-.03em; margin:0 0 .4rem; }
+.lede { font-size:1.15rem; color:var(--muted); margin:0 0 2rem; }
+code, pre { font-family:ui-monospace,Menlo,monospace; font-size:.86em; }
+pre { background:rgba(127,127,127,.08); border:1px solid var(--line); padding:1rem; overflow:auto; border-radius:8px; }
+a { color:var(--ok); }
+.box { border:1px solid var(--line); border-radius:10px; padding:1rem 1.1rem; margin:1.4rem 0; }
+</style>
+</head>
+<body>
+<main>
+<p style="color:var(--muted); font-size:.9rem; letter-spacing:.06em; text-transform:uppercase;">Public experiment · 2026</p>
+<h1>Agent Run Receipts</h1>
+<p class="lede">A paper trail for one AI-written code change. Not a scanner. You do not run it by hand.</p>
+
+<p>Coding agents now open real pull requests. Teams merge on a chat summary or a green badge. That is not a record.</p>
+<p>A <strong>receipt</strong> is a small file that says: these files changed, this policy was checked, these tests ran, and here is a fingerprint. Change the story later and the fingerprint no longer matches.</p>
+
+<div class="box">
+<strong>You never decide when to run it.</strong>
+<p>Add one GitHub Action to a repo. Every pull request gets a receipt, posted on the PR. Install once.</p>
+</div>
+
+<pre>uses: 5ninefish/agent-run-receipts@main
+# or copy examples/install-on-your-repo.yml</pre>
+
+<p>
+  <a href="https://github.com/5ninefish/agent-run-receipts">GitHub</a>
+  · <a href="https://github.com/5ninefish/agent-run-receipts/blob/main/PROOF.md">30-day kill bar</a>
+  · <a href="https://github.com/5ninefish/agent-run-receipts/blob/main/docs/launch-posts.md">How this was announced</a>
+</p>
+
+<p style="color:var(--muted); font-size:.92rem;">This is a 30-day experiment, not a company. If almost nobody uses it on a private repo, it dies.</p>
+</main>
+</body>
+</html>
