@@ -6,3 +6,4 @@ dist/
 build/
 .venv/
 corpus/task*.json
+.DS_Store
