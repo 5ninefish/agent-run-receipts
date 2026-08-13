@@ -1,0 +1,6 @@
+{
+  "schema": "agent-run-receipt-policy/v0",
+  "deny_path_globs": [".env", ".env.*", "**/.env", "**/secrets/**"],
+  "deny_diff_regexes": ["(?i)(api[_-]?key|secret|password|private[_-]?key)\\s*[:=]"],
+  "max_diff_bytes": 1000000
+}

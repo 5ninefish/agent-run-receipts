@@ -1,0 +1,53 @@
+name: Agent Run Receipts
+description: Emit a tamper-evident receipt for an agent-produced diff, transcript, policy check, and optional test command.
+author: Dalen Kahiapo
+branding:
+  icon: shield
+  color: gray-dark
+inputs:
+  diff:
+    description: Path to the unified diff
+    required: true
+  transcript:
+    description: Path to the agent transcript
+    required: false
+    default: ""
+  policy:
+    description: Path to policy JSON
+    required: false
+    default: ""
+  test_cmd:
+    description: Test command to record (and optionally run)
+    required: false
+    default: ""
+  run_tests:
+    description: If "true", execute test_cmd
+    required: false
+    default: "false"
+  output:
+    description: Where to write the receipt JSON
+    required: false
+    default: agent-run-receipt.json
+runs:
+  using: composite
+  steps:
+    - name: Emit receipt
+      shell: bash
+      run: |
+        set -euo pipefail
+        ARGS=(emit --diff "${{ inputs.diff }}" -o "${{ inputs.output }}")
+        if [ -n "${{ inputs.transcript }}" ]; then ARGS+=(--transcript "${{ inputs.transcript }}"); fi
+        if [ -n "${{ inputs.policy }}" ]; then ARGS+=(--policy "${{ inputs.policy }}"); fi
+        if [ -n "${{ inputs.test_cmd }}" ]; then ARGS+=(--test-cmd "${{ inputs.test_cmd }}"); fi
+        if [ "${{ inputs.run_tests }}" = "true" ]; then ARGS+=(--run-tests); fi
+        PYTHONPATH="${{ github.action_path }}" python3 -m arr "${ARGS[@]}"
+        echo "receipt=${{ inputs.output }}" >> "$GITHUB_OUTPUT"
+        echo "### Agent Run Receipt" >> "$GITHUB_STEP_SUMMARY"
+        python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+        import json, pathlib, os
+        p = pathlib.Path("${{ inputs.output }}")
+        data = json.loads(p.read_text())
+        print(f"- receipt_sha256: `{data.get('receipt_sha256')}`")
+        print(f"- policy pass: {data['checks']['policy']['pass']}")
+        print(f"- tests ran: {data['checks']['tests']['ran']} exit={data['checks']['tests'].get('exit_code')}")
+        PY

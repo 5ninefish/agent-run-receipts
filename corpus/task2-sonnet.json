@@ -1,0 +1,51 @@
+{
+  "changed_paths": [
+    "project_guard.py"
+  ],
+  "checks": {
+    "policy": {
+      "pass": true,
+      "violations": []
+    },
+    "tests": {
+      "exit_code": null,
+      "ran": false,
+      "reason": "not requested",
+      "stderr_sha256": null,
+      "stdout_sha256": null,
+      "timed_out": false
+    }
+  },
+  "created_at": "2026-08-13T01:39:12Z",
+  "inputs": {
+    "diff": {
+      "bytes": 2016,
+      "label": "diff",
+      "path": "/Users/dalen/Dbrain/scripts/brokered_trial/results/task2/sonnet/patch.diff",
+      "sha256": "bcf22d3d14d3cf8b5be35b5302d9586b757774da3275441564a6539288065bfd"
+    },
+    "policy": {
+      "bytes": 253,
+      "label": "policy",
+      "path": null,
+      "sha256": "4e6ecc509b5f748146bb602094163caa839912552645fe928218206bba68f825"
+    },
+    "test_command": {
+      "command": null,
+      "label": "test_command",
+      "sha256": null
+    },
+    "transcript": {
+      "bytes": 0,
+      "label": "transcript",
+      "path": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "judges": {
+    "note": "optional; omitted in v0 unless supplied"
+  },
+  "receipt_sha256": "b57995930dba4e8ec794c35bd2853f8469e41968ce878afd40e4cf570ed62aa9",
+  "schema": "agent-run-receipt/v0",
+  "tool_version": "0.1.0"
+}

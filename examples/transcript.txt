@@ -1,0 +1,3 @@
+agent: I will update greet() to take a name and add ready().
+tool: apply_patch src/app.py
+agent: tests not requested in this fixture.

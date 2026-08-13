@@ -1,0 +1,51 @@
+{
+  "changed_paths": [
+    "src/app.py"
+  ],
+  "checks": {
+    "policy": {
+      "pass": true,
+      "violations": []
+    },
+    "tests": {
+      "exit_code": null,
+      "ran": false,
+      "reason": "not requested",
+      "stderr_sha256": null,
+      "stdout_sha256": null,
+      "timed_out": false
+    }
+  },
+  "created_at": "2026-08-13T01:39:12Z",
+  "inputs": {
+    "diff": {
+      "bytes": 215,
+      "label": "diff",
+      "path": "examples/ok.diff",
+      "sha256": "b9b502daab16c94e7d12423950eb85d5d9d4339700bf80c8d40ca7fca7e41831"
+    },
+    "policy": {
+      "bytes": 230,
+      "label": "policy",
+      "path": "examples/policy.json",
+      "sha256": "53a3d8b1ad005617dc155523947e68261e98dfb566589053fc0dd2a486c59a64"
+    },
+    "test_command": {
+      "command": null,
+      "label": "test_command",
+      "sha256": null
+    },
+    "transcript": {
+      "bytes": 134,
+      "label": "transcript",
+      "path": "examples/transcript.txt",
+      "sha256": "11a85cb95334d302020c00bbe7e2dfe4ec5618a3e6198712821ab93f98754038"
+    }
+  },
+  "judges": {
+    "note": "optional; omitted in v0 unless supplied"
+  },
+  "receipt_sha256": "3c4577aef61379b94a610cf73da3de7aa43978cbac2e1adcbe76211b4776df17",
+  "schema": "agent-run-receipt/v0",
+  "tool_version": "0.1.0"
+}

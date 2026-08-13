@@ -1,0 +1,51 @@
+{
+  "changed_paths": [
+    "CLAUDE.md"
+  ],
+  "checks": {
+    "policy": {
+      "pass": true,
+      "violations": []
+    },
+    "tests": {
+      "exit_code": null,
+      "ran": false,
+      "reason": "not requested",
+      "stderr_sha256": null,
+      "stdout_sha256": null,
+      "timed_out": false
+    }
+  },
+  "created_at": "2026-08-13T01:39:13Z",
+  "inputs": {
+    "diff": {
+      "bytes": 2899,
+      "label": "diff",
+      "path": "/Users/dalen/Dbrain/scripts/brokered_trial/results/task3/grok/patch.diff",
+      "sha256": "9ee2a9075184893ff483fe15fd338eaa15a6c1394723b5efe764e57df0d1d3c4"
+    },
+    "policy": {
+      "bytes": 253,
+      "label": "policy",
+      "path": null,
+      "sha256": "4e6ecc509b5f748146bb602094163caa839912552645fe928218206bba68f825"
+    },
+    "test_command": {
+      "command": null,
+      "label": "test_command",
+      "sha256": null
+    },
+    "transcript": {
+      "bytes": 0,
+      "label": "transcript",
+      "path": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "judges": {
+    "note": "optional; omitted in v0 unless supplied"
+  },
+  "receipt_sha256": "0222afdf499e470490983ae969e7a9f4189c29d39dd822c821d430d044f84c17",
+  "schema": "agent-run-receipt/v0",
+  "tool_version": "0.1.0"
+}
