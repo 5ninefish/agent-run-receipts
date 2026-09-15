@@ -2,6 +2,10 @@
 
 Not a company. Clock started **2026-08-13**. Check **2026-09-12**.
 
+**Killed 2026-09-14.** Strong+ missed (0 external private-repo CI teams). Stars
+did not count. Do not treat this repo as a live product. No Sigstore / App /
+dashboard.
+
 https://github.com/5ninefish/agent-run-receipts
 
 ## What we are buying an answer to
